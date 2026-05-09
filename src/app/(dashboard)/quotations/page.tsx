@@ -98,37 +98,37 @@ export default async function QuotationsPage({
     <div className="space-y-6">
       <div className="flex flex-wrap items-start justify-between gap-4">
         <div>
-          <h1 className="text-2xl font-semibold text-slate-900">Quotations</h1>
-          <p className="mt-1 text-sm text-slate-600">
-            Internal quotes: line items, VAT, optional discount approval workflow.
+          <h1 className="app-page-title">Quotations</h1>
+          <p className="app-page-subtitle">
+            Line items, VAT, discounts, and approval workflow - tuned for fast scanning and trusted
+            numbers.
           </p>
         </div>
         <div className="flex flex-wrap gap-2">
-          <Link
-            href="/quotations/analytics"
-            className="rounded-md border border-slate-300 bg-white px-4 py-2 text-sm font-medium text-slate-800 hover:bg-slate-50"
-          >
+          <Link href="/quotations/analytics" className="app-btn-secondary px-4 py-2">
             Analytics
           </Link>
           {canCreate ? (
-            <Link
-              href="/quotations/new"
-              className="rounded-md bg-slate-900 px-4 py-2 text-sm font-medium text-white hover:bg-slate-800"
-            >
+            <Link href="/quotations/new" className="app-btn-primary px-4 py-2">
               New quotation
             </Link>
           ) : null}
         </div>
       </div>
 
-      <form method="get" action="/quotations" className="flex flex-wrap items-end gap-3 rounded-xl border bg-white p-4 shadow-sm">
+      <form method="get" action="/quotations" className="app-filter-panel">
         <div className="min-w-[180px] flex-1">
-          <label className="block text-xs font-medium text-slate-600">Search</label>
-          <input name="q" defaultValue={q ?? ""} placeholder="Code or customer" className="mt-1 w-full rounded-md border px-3 py-2 text-sm" />
+          <label className="app-label">Search</label>
+          <input
+            name="q"
+            defaultValue={q ?? ""}
+            placeholder="Code or customer"
+            className="app-input"
+          />
         </div>
         <div>
-          <label className="block text-xs font-medium text-slate-600">Status</label>
-          <select name="status" defaultValue={status ?? "ALL"} className="mt-1 rounded-md border px-3 py-2 text-sm">
+          <label className="app-label">Status</label>
+          <select name="status" defaultValue={status ?? "ALL"} className="app-select w-auto min-w-[160px]">
             <option value="ALL">All</option>
             <option value="DRAFT">Draft</option>
             <option value="PENDING_APPROVAL">Pending approval</option>
@@ -140,8 +140,8 @@ export default async function QuotationsPage({
           </select>
         </div>
         <div>
-          <label className="block text-xs font-medium text-slate-600">Owner</label>
-          <select name="ownerId" defaultValue={ownerId ?? ""} className="mt-1 rounded-md border px-3 py-2 text-sm">
+          <label className="app-label">Owner</label>
+          <select name="ownerId" defaultValue={ownerId ?? ""} className="app-select w-auto min-w-[200px]">
             <option value="">All owners</option>
             {owners.map((o) => (
               <option key={o.id} value={o.id}>
@@ -151,51 +151,41 @@ export default async function QuotationsPage({
           </select>
         </div>
         <div>
-          <label className="block text-xs font-medium text-slate-600">From date</label>
-          <input
-            type="date"
-            name="fromDate"
-            defaultValue={fromDate ?? ""}
-            className="mt-1 rounded-md border px-3 py-2 text-sm"
-          />
+          <label className="app-label">From date</label>
+          <input type="date" name="fromDate" defaultValue={fromDate ?? ""} className="app-input w-auto" />
         </div>
         <div>
-          <label className="block text-xs font-medium text-slate-600">To date</label>
-          <input
-            type="date"
-            name="toDate"
-            defaultValue={toDate ?? ""}
-            className="mt-1 rounded-md border px-3 py-2 text-sm"
-          />
+          <label className="app-label">To date</label>
+          <input type="date" name="toDate" defaultValue={toDate ?? ""} className="app-input w-auto" />
         </div>
-        <button type="submit" className="rounded-md border border-slate-300 px-4 py-2 text-sm">
+        <button type="submit" className="app-btn-secondary px-4 py-2">
           Filter
         </button>
-        <Link href="/quotations" className="text-sm text-slate-600 hover:text-slate-900">
+        <Link href="/quotations" className="app-link self-center text-sm">
           Reset
         </Link>
         <Link
           href={`/quotations?${buildQuery({ ...keep, fromDate: formatDateInput(sevenDaysAgo), toDate: formatDateInput(today) })}`}
-          className="text-sm text-slate-600 hover:text-slate-900"
+          className="app-link self-center text-sm"
         >
           Last 7 days
         </Link>
         <Link
           href={`/quotations?${buildQuery({ ...keep, fromDate: formatDateInput(thirtyDaysAgo), toDate: formatDateInput(today) })}`}
-          className="text-sm text-slate-600 hover:text-slate-900"
+          className="app-link self-center text-sm"
         >
           Last 30 days
         </Link>
         <Link
           href={`/quotations?${buildQuery({ ...keep, fromDate: formatDateInput(quarterStart), toDate: formatDateInput(today) })}`}
-          className="text-sm text-slate-600 hover:text-slate-900"
+          className="app-link self-center text-sm"
         >
           This quarter
         </Link>
         {canExport ? (
           <a
             href={`/api/quotations/export-csv${queryNow ? `?${queryNow}` : ""}`}
-            className="rounded-md border border-slate-300 px-4 py-2 text-sm text-slate-700 hover:bg-slate-50"
+            className="app-btn-secondary px-4 py-2 text-sm"
           >
             Export CSV
           </a>
@@ -213,9 +203,9 @@ export default async function QuotationsPage({
           ["Won", pipeline.byStatus.WON],
           ["Lost", pipeline.byStatus.LOST],
         ].map(([label, value]) => (
-          <div key={String(label)} className="rounded-lg border bg-white px-3 py-2 text-sm shadow-sm">
-            <p className="text-slate-500">{label}</p>
-            <p className="text-lg font-semibold text-slate-900">{value}</p>
+          <div key={String(label)} className="app-stat">
+            <p className="app-stat-label">{label}</p>
+            <p className="app-stat-value">{value}</p>
           </div>
         ))}
       </div>
@@ -228,50 +218,57 @@ export default async function QuotationsPage({
           ["Avg won deal", formatVnd(Math.round(health.avgWonDealValue))],
           ["Avg discount", `${health.avgDiscountAllPct.toFixed(2)}%`],
         ].map(([label, value]) => (
-          <div key={String(label)} className="rounded-lg border bg-white px-3 py-2 text-sm shadow-sm">
-            <p className="text-slate-500">{label}</p>
-            <p className="text-lg font-semibold text-slate-900">{value}</p>
+          <div key={String(label)} className="app-stat">
+            <p className="app-stat-label">{label}</p>
+            <p className="app-stat-value">{value}</p>
           </div>
         ))}
       </div>
 
-      <div className="overflow-x-auto rounded-xl border bg-white shadow-sm">
-        <table className="min-w-full text-left text-sm">
-          <thead className="border-b bg-slate-50 text-slate-600">
+      <div className="app-table-wrap">
+        <table>
+          <thead>
             <tr>
-              <th className="px-4 py-3">Code</th>
-              <th className="px-4 py-3">Customer</th>
-              <th className="px-4 py-3">Status</th>
-              <th className="px-4 py-3 text-right">Total</th>
-              <th className="px-4 py-3">Owner</th>
+              <th>Code</th>
+              <th>Customer</th>
+              <th>Status</th>
+              <th className="text-right">Total</th>
+              <th>Owner</th>
             </tr>
           </thead>
           <tbody>
             {quotationPage.rows.length === 0 ? (
               <tr>
-                <td colSpan={5} className="px-4 py-8 text-center text-slate-500">
-                  No quotations match your filters.
+                <td colSpan={5}>
+                  <div className="app-empty border-0">No quotations match your filters.</div>
                 </td>
               </tr>
             ) : (
               quotationPage.rows.map((row) => (
-                <tr key={row.id} className="border-t">
-                  <td className="px-4 py-3">
-                    <Link href={`/quotations/${row.id}`} className="font-medium text-slate-900 hover:underline">
+                <tr key={row.id}>
+                  <td>
+                    <Link
+                      href={`/quotations/${row.id}`}
+                      className="font-semibold text-[var(--text-primary)] underline-offset-2 hover:underline"
+                    >
                       {row.code}
                     </Link>
                   </td>
-                  <td className="px-4 py-3 text-slate-700">{row.customerName}</td>
-                  <td className="px-4 py-3">
-                    <span className={`rounded px-2 py-0.5 text-xs font-medium ${quotationStatusBadgeClass(row.status)}`}>
+                  <td className="text-[var(--text-secondary)]">{row.customerName}</td>
+                  <td>
+                    <span
+                      className={`inline-flex rounded px-2 py-0.5 text-xs font-medium ${quotationStatusBadgeClass(row.status)}`}
+                    >
                       {quotationStatusLabel(row.status)}
                     </span>
                     {row.approvals.length > 0 ? (
-                      <span className="ml-2 text-xs text-amber-700">approval</span>
+                      <span className="ml-2 text-xs font-medium text-[var(--warning-fg)]">approval</span>
                     ) : null}
                   </td>
-                  <td className="px-4 py-3 text-right">{formatVnd(Number(row.totalAmount))}</td>
-                  <td className="px-4 py-3 text-slate-600">{row.createdBy.fullName}</td>
+                  <td className="text-right font-medium tabular-nums text-[var(--text-primary)]">
+                    {formatVnd(Number(row.totalAmount))}
+                  </td>
+                  <td className="text-[var(--text-muted)]">{row.createdBy.fullName}</td>
                 </tr>
               ))
             )}
@@ -279,9 +276,9 @@ export default async function QuotationsPage({
         </table>
       </div>
 
-      <div className="flex flex-wrap items-center justify-between gap-3 text-sm">
-        <p className="text-slate-600">
-          Showing {quotationPage.rows.length} of {quotationPage.total} quotations - page {quotationPage.page}/
+      <div className="flex flex-wrap items-center justify-between gap-3 text-sm text-[var(--text-secondary)]">
+        <p>
+          Showing {quotationPage.rows.length} of {quotationPage.total} - page {quotationPage.page}/
           {quotationPage.totalPages}
         </p>
         <div className="flex items-center gap-2">
@@ -295,7 +292,7 @@ export default async function QuotationsPage({
                 toDate,
                 page: String(quotationPage.page - 1),
               })}`}
-              className="rounded-md border border-slate-300 px-3 py-1.5 hover:bg-slate-50"
+              className="app-btn-secondary px-3 py-1.5 text-sm"
             >
               Previous
             </Link>
@@ -310,7 +307,7 @@ export default async function QuotationsPage({
                 toDate,
                 page: String(quotationPage.page + 1),
               })}`}
-              className="rounded-md border border-slate-300 px-3 py-1.5 hover:bg-slate-50"
+              className="app-btn-secondary px-3 py-1.5 text-sm"
             >
               Next
             </Link>

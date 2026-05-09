@@ -24,20 +24,20 @@ export function quotationStatusLabel(status: QuotationStatus | string): string {
 export function quotationStatusBadgeClass(status: QuotationStatus | string): string {
   switch (status) {
     case "DRAFT":
-      return "bg-slate-100 text-slate-700";
+      return "border border-[var(--border)] bg-[var(--surface-muted)] text-[var(--text-secondary)]";
     case "PENDING_APPROVAL":
-      return "bg-amber-100 text-amber-800";
+      return "border border-amber-200/80 bg-[var(--warning-bg)] text-[var(--warning-fg)]";
     case "APPROVED":
-      return "bg-emerald-100 text-emerald-800";
+      return "border border-emerald-200/70 bg-[var(--success-bg)] text-[var(--success-fg)]";
     case "SENT":
-      return "bg-sky-100 text-sky-800";
+      return "border border-sky-200/70 bg-[var(--info-bg)] text-[var(--info-fg)]";
     case "NEGOTIATING":
-      return "bg-indigo-100 text-indigo-800";
+      return "border border-violet-200/70 bg-violet-50 text-violet-900";
     case "WON":
-      return "bg-emerald-200 text-emerald-900";
+      return "border border-emerald-300/80 bg-emerald-100/90 text-emerald-950";
     case "LOST":
-      return "bg-rose-100 text-rose-800";
+      return "border border-rose-200/80 bg-[var(--danger-bg)] text-[var(--danger-fg)]";
     default:
-      return "bg-slate-100 text-slate-700";
+      return "border border-[var(--border)] bg-[var(--surface-muted)] text-[var(--text-secondary)]";
   }
 }

@@ -38,17 +38,23 @@ export function DashboardShell({
 
   return (
     <div className="min-h-screen">
-      <div className="mx-auto grid max-w-[1300px] grid-cols-[250px_1fr] gap-6 px-4 py-6">
-        <aside className="app-card p-4">
-          <div className="mb-5 rounded-xl bg-gradient-to-br from-[#20344c] to-[#2b4b6c] p-4 text-white">
-            <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-white/10 font-bold text-[#d1b077]">
+      <div className="mx-auto grid max-w-[1300px] grid-cols-1 gap-6 px-4 py-6 md:grid-cols-[258px_1fr]">
+        <aside className="app-shell-sidebar h-fit p-4">
+          <Link
+            href="/"
+            className="group mb-6 block overflow-hidden rounded-[var(--radius-lg)] bg-gradient-to-br from-[var(--brand-navy)] to-[var(--brand-navy-gradient-end)] p-4 text-left text-white shadow-md ring-1 ring-white/10 transition hover:brightness-[1.04]"
+          >
+            <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-white/12 font-semibold text-[var(--brand-gold)]">
               G
             </div>
-            <p className="mt-3 text-[11px] uppercase tracking-[0.16em] text-white/70">GOMITA</p>
-            <h2 className="mt-1 text-lg font-semibold">Internal Portal</h2>
-            <p className="mt-1 text-xs text-white/75">Operations · Training · Compliance</p>
-          </div>
-          <nav className="space-y-1">
+            <p className="mt-3 text-[11px] uppercase tracking-[0.18em] text-white/72">GOMITA</p>
+            <h2 className="font-display mt-1 text-lg font-semibold tracking-tight">Internal Portal</h2>
+            <p className="mt-1 text-xs leading-relaxed text-white/78">Studio nội thất · Vận hành nội bộ</p>
+            <p className="mt-3 text-[10px] font-medium uppercase tracking-wider text-[var(--brand-gold)]/90 opacity-0 transition group-hover:opacity-100">
+              Về trang giới thiệu
+            </p>
+          </Link>
+          <nav className="space-y-0.5">
             {nav.map((item) => {
               const Icon = item.icon;
               const showBadge = item.href === "/notifications" && liveUnread > 0;
@@ -57,16 +63,16 @@ export function DashboardShell({
                 <Link
                   key={item.href}
                   href={item.href}
-                  className={`relative flex items-center gap-2 rounded-lg px-3 py-2.5 text-sm transition ${
+                  className={`flex items-center gap-2.5 rounded-[var(--radius-md)] border-l-[3px] py-2.5 pl-3 pr-3 text-sm transition ${
                     active
-                      ? "bg-[#20344c] text-white shadow"
-                      : "text-slate-700 hover:bg-slate-100"
+                      ? "border-[var(--brand-gold)] bg-[var(--brand-navy)] font-medium text-white shadow-sm ring-1 ring-black/5"
+                      : "border-transparent text-[var(--text-secondary)] hover:bg-[var(--brand-navy-muted)] hover:text-[var(--text-primary)]"
                   }`}
                 >
-                  <Icon className="h-4 w-4 shrink-0" />
+                  <Icon className="h-4 w-4 shrink-0 opacity-90" />
                   <span className="flex-1">{item.label}</span>
                   {showBadge ? (
-                    <span className="rounded-full bg-[#d1b077] px-2 py-0.5 text-[10px] font-semibold text-[#122033]">
+                    <span className="rounded-full bg-[var(--brand-gold)] px-2 py-0.5 text-[10px] font-semibold text-[var(--brand-navy)]">
                       {liveUnread > 99 ? "99+" : liveUnread}
                     </span>
                   ) : null}
@@ -76,19 +82,23 @@ export function DashboardShell({
           </nav>
         </aside>
         <div className="min-w-0 space-y-4">
-          <div className="app-card flex items-center justify-between px-4 py-3">
+          <div className="app-header-bar flex flex-wrap items-center justify-between gap-3 px-4 py-3.5">
             <div>
-              <p className="text-xs uppercase tracking-[0.14em] text-slate-500">Workspace</p>
-              <p className="text-sm font-semibold text-slate-900">GOMITA Internal Operations</p>
+              <p className="text-[11px] font-semibold uppercase tracking-[0.14em] text-[var(--text-muted)]">
+                Workspace
+              </p>
+              <p className="mt-0.5 text-sm font-semibold text-[var(--text-primary)]">
+                GOMITA — Vận hành nội bộ
+              </p>
             </div>
             <Link
               href="/notifications"
-              className="relative inline-flex items-center gap-2 rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm font-medium text-slate-800 shadow-sm hover:bg-slate-50"
+              className="app-btn-secondary relative inline-flex items-center gap-2 px-3 py-2 text-sm shadow-none"
             >
-              <Bell className="h-4 w-4" />
-              Messages
+              <Bell className="h-4 w-4 text-[var(--brand-navy)]" />
+              Thông báo
               {liveUnread > 0 ? (
-                <span className="absolute -right-1 -top-1 flex h-5 min-w-5 items-center justify-center rounded-full bg-[#d1b077] px-1 text-[11px] font-bold text-[#122033]">
+                <span className="absolute -right-1 -top-1 flex h-5 min-w-5 items-center justify-center rounded-full bg-[var(--brand-gold)] px-1 text-[11px] font-bold text-[var(--brand-navy)]">
                   {liveUnread > 99 ? "99+" : liveUnread}
                 </span>
               ) : null}

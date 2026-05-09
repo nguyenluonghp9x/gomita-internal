@@ -6,7 +6,7 @@ export default async function NewsPage() {
 
   return (
     <div className="space-y-5">
-      <div className="app-card bg-gradient-to-r from-[#20344c] to-[#2f4d6f] p-5 text-white">
+      <div className="app-card bg-gradient-to-r from-[var(--brand-navy)] to-[var(--brand-navy-gradient-end)] p-5 text-white">
         <p className="text-xs uppercase tracking-[0.16em] text-white/70">Internal Newsroom</p>
         <h1 className="mt-1 text-2xl font-semibold">Ban tin noi bo GOMITA</h1>
         <p className="mt-1 text-sm text-white/80">
@@ -18,7 +18,7 @@ export default async function NewsPage() {
         {DEMO_NEWS_POSTS.map((post) => (
           <article key={post.id} className="app-card p-5">
             <div className="flex flex-wrap items-center gap-2">
-              <span className="rounded-full bg-[#edf2f8] px-2.5 py-1 text-xs font-medium text-[#20344c]">
+              <span className="rounded-full bg-[var(--brand-gold-muted)] px-2.5 py-1 text-xs font-medium text-[var(--brand-navy)]">
                 {post.category}
               </span>
               <span className="text-xs text-slate-500">
