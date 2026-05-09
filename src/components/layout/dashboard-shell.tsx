@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import { usePathname } from "next/navigation";
 import {
   Bell,
   BookOpen,
@@ -31,26 +32,35 @@ export function DashboardShell({
   unreadCount?: number;
 }) {
   const liveUnread = useNotificationUnreadStream(unreadCount);
+  const pathname = usePathname();
 
   return (
-    <div className="min-h-screen bg-slate-50">
-      <div className="mx-auto grid max-w-7xl grid-cols-[240px_1fr] gap-6 px-4 py-6">
-        <aside className="rounded-xl border bg-white p-4 shadow-sm">
-          <h2 className="mb-4 text-lg font-semibold text-slate-900">GOMITA Internal</h2>
+    <div className="min-h-screen">
+      <div className="mx-auto grid max-w-[1300px] grid-cols-[250px_1fr] gap-6 px-4 py-6">
+        <aside className="app-card p-4">
+          <div className="mb-5 rounded-xl bg-[#20344c] p-4 text-white">
+            <p className="text-[11px] uppercase tracking-[0.16em] text-white/70">GOMITA</p>
+            <h2 className="mt-1 text-lg font-semibold">Internal Portal</h2>
+          </div>
           <nav className="space-y-1">
             {nav.map((item) => {
               const Icon = item.icon;
               const showBadge = item.href === "/notifications" && liveUnread > 0;
+              const active = pathname === item.href || pathname.startsWith(`${item.href}/`);
               return (
                 <Link
                   key={item.href}
                   href={item.href}
-                  className="relative flex items-center gap-2 rounded-md px-3 py-2 text-sm text-slate-700 hover:bg-slate-100"
+                  className={`relative flex items-center gap-2 rounded-lg px-3 py-2.5 text-sm transition ${
+                    active
+                      ? "bg-[#20344c] text-white shadow"
+                      : "text-slate-700 hover:bg-slate-100"
+                  }`}
                 >
                   <Icon className="h-4 w-4 shrink-0" />
                   <span className="flex-1">{item.label}</span>
                   {showBadge ? (
-                    <span className="rounded-full bg-rose-600 px-2 py-0.5 text-[10px] font-semibold text-white">
+                    <span className="rounded-full bg-[#d1b077] px-2 py-0.5 text-[10px] font-semibold text-[#122033]">
                       {liveUnread > 99 ? "99+" : liveUnread}
                     </span>
                   ) : null}
@@ -60,15 +70,19 @@ export function DashboardShell({
           </nav>
         </aside>
         <div className="min-w-0 space-y-4">
-          <div className="flex items-center justify-end border-b border-slate-200 pb-3">
+          <div className="app-card flex items-center justify-between px-4 py-3">
+            <div>
+              <p className="text-xs uppercase tracking-[0.14em] text-slate-500">Workspace</p>
+              <p className="text-sm font-semibold text-slate-900">GOMITA Internal Operations</p>
+            </div>
             <Link
               href="/notifications"
-              className="relative inline-flex items-center gap-2 rounded-md border border-slate-200 bg-white px-3 py-2 text-sm font-medium text-slate-800 shadow-sm hover:bg-slate-50"
+              className="relative inline-flex items-center gap-2 rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm font-medium text-slate-800 shadow-sm hover:bg-slate-50"
             >
               <Bell className="h-4 w-4" />
               Messages
               {liveUnread > 0 ? (
-                <span className="absolute -right-1 -top-1 flex h-5 min-w-5 items-center justify-center rounded-full bg-rose-600 px-1 text-[11px] font-bold text-white">
+                <span className="absolute -right-1 -top-1 flex h-5 min-w-5 items-center justify-center rounded-full bg-[#d1b077] px-1 text-[11px] font-bold text-[#122033]">
                   {liveUnread > 99 ? "99+" : liveUnread}
                 </span>
               ) : null}

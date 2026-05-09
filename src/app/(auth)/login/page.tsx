@@ -17,7 +17,7 @@ export default function LoginPage() {
     const result = await signIn("credentials", {
       email,
       password,
-      callbackUrl: "/dashboard/dashboard",
+      callbackUrl: "/dashboard",
       redirect: true,
     });
 
@@ -28,28 +28,31 @@ export default function LoginPage() {
   };
 
   return (
-    <div className="flex min-h-screen items-center justify-center bg-slate-100 p-6">
+    <div className="flex min-h-screen items-center justify-center p-6">
       <form
         onSubmit={onSubmit}
-        className="w-full max-w-md space-y-4 rounded-xl border bg-white p-6 shadow-sm"
+        className="w-full max-w-md space-y-4 rounded-2xl border border-slate-200 bg-white/95 p-6 shadow-[0_16px_45px_rgba(17,29,46,0.14)]"
       >
-        <h1 className="text-2xl font-semibold text-slate-900">GOMITA Internal Sign In</h1>
-        <p className="text-sm text-slate-600">Use your internal account to access the portal.</p>
+        <div className="rounded-xl bg-[#20344c] px-4 py-3 text-white">
+          <p className="text-xs uppercase tracking-[0.16em] text-white/75">GOMITA</p>
+          <h1 className="mt-1 text-xl font-semibold">Internal Portal</h1>
+          <p className="mt-1 text-xs text-white/80">Secure sign-in for operations, training and quotations.</p>
+        </div>
 
         <div>
-          <label className="mb-1 block text-sm font-medium">Email</label>
+          <label className="mb-1 block text-sm font-medium text-slate-700">Email</label>
           <input
-            className="w-full rounded-md border px-3 py-2"
+            className="w-full rounded-lg border border-slate-300 px-3 py-2 outline-none transition focus:border-[#20344c]"
             value={email}
             onChange={(e) => setEmail(e.target.value)}
           />
         </div>
 
         <div>
-          <label className="mb-1 block text-sm font-medium">Password</label>
+          <label className="mb-1 block text-sm font-medium text-slate-700">Password</label>
           <input
             type="password"
-            className="w-full rounded-md border px-3 py-2"
+            className="w-full rounded-lg border border-slate-300 px-3 py-2 outline-none transition focus:border-[#20344c]"
             value={password}
             onChange={(e) => setPassword(e.target.value)}
           />
@@ -59,7 +62,7 @@ export default function LoginPage() {
 
         <button
           disabled={loading}
-          className="w-full rounded-md bg-slate-900 px-3 py-2 text-white disabled:opacity-60"
+          className="w-full rounded-lg bg-[#20344c] px-3 py-2 text-white transition hover:bg-[#182b40] disabled:opacity-60"
         >
           {loading ? "Signing in..." : "Sign in"}
         </button>

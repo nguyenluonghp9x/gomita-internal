@@ -1,8 +1,12 @@
 @import "tailwindcss";
 
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  --background: #f4f7fb;
+  --foreground: #122033;
+  --brand-navy: #20344c;
+  --brand-gold: #d1b077;
+  --brand-surface: #ffffff;
+  --brand-border: #dbe4f0;
 }
 
 @theme inline {
@@ -19,8 +23,23 @@
   }
 }
 
+* {
+  box-sizing: border-box;
+}
+
 body {
-  background: var(--background);
+  margin: 0;
+  background:
+    radial-gradient(1000px 450px at 0% -10%, rgba(32, 52, 76, 0.09), transparent),
+    radial-gradient(850px 420px at 100% 0%, rgba(209, 176, 119, 0.12), transparent),
+    var(--background);
   color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: Inter, Arial, Helvetica, sans-serif;
+}
+
+.app-card {
+  border: 1px solid var(--brand-border);
+  background: var(--brand-surface);
+  border-radius: 14px;
+  box-shadow: 0 8px 24px rgba(16, 30, 48, 0.06);
 }

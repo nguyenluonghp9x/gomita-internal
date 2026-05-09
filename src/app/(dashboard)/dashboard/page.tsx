@@ -14,25 +14,30 @@ export default async function DashboardPage() {
   ];
 
   return (
-    <div className="space-y-4">
-      <h1 className="text-2xl font-semibold text-slate-900">Dashboard Overview</h1>
+    <div className="space-y-5">
+      <div className="app-card bg-gradient-to-r from-[#20344c] to-[#2b4562] p-5 text-white">
+        <p className="text-xs uppercase tracking-[0.16em] text-white/70">Dashboard</p>
+        <h1 className="mt-1 text-2xl font-semibold">Tong quan he thong GOMITA</h1>
+        <p className="mt-1 text-sm text-white/80">Theo doi nhanh nhan su, dao tao, tai lieu va bao gia.</p>
+      </div>
+
       <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
         {cards.map((card) => (
-          <div key={card.label} className="rounded-xl border bg-white p-4 shadow-sm">
+          <div key={card.label} className="app-card p-4">
             <p className="text-sm text-slate-500">{card.label}</p>
-            <p className="mt-2 text-2xl font-semibold text-slate-900">{card.value}</p>
+            <p className="mt-2 text-3xl font-semibold text-[#20344c]">{card.value}</p>
           </div>
         ))}
       </div>
 
-      <div className="rounded-xl border bg-white p-4 shadow-sm">
+      <div className="app-card p-4">
         <h2 className="text-lg font-semibold text-slate-900">Recent Audit Activities</h2>
         <div className="mt-3 space-y-2">
           {stats.recentAudit.length === 0 ? (
             <p className="text-sm text-slate-500">No recent activities.</p>
           ) : (
             stats.recentAudit.map((row) => (
-              <div key={row.id} className="rounded-md border bg-slate-50 px-3 py-2 text-sm">
+              <div key={row.id} className="rounded-lg border border-slate-200 bg-slate-50/70 px-3 py-2 text-sm">
                 <p className="font-medium text-slate-800">
                   {row.action} - {row.module}/{row.resource}
                 </p>
