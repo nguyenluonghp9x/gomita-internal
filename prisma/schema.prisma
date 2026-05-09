@@ -1,0 +1,595 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum UserStatus {
+  PROBATION
+  ACTIVE
+  SUSPENDED
+  TERMINATED
+}
+
+enum EmploymentLevel {
+  STAFF
+  LEAD
+  MANAGER
+  ADMIN
+  BOARD
+}
+
+enum AssignmentTargetType {
+  USER
+  ROLE
+  DEPARTMENT
+  POSITION
+}
+
+enum LessonType {
+  VIDEO
+  ARTICLE
+  PDF
+  SLIDE
+  DOWNLOAD
+}
+
+enum QuizQuestionType {
+  MULTIPLE_CHOICE
+  SHORT_ESSAY
+}
+
+enum DocumentStatus {
+  DRAFT
+  PENDING_APPROVAL
+  PUBLISHED
+  EXPIRED
+}
+
+enum PolicyStatus {
+  DRAFT
+  PUBLISHED
+  EXPIRED
+}
+
+enum QuotationStatus {
+  DRAFT
+  PENDING_APPROVAL
+  APPROVED
+  SENT
+  NEGOTIATING
+  WON
+  LOST
+}
+
+enum ApprovalStatus {
+  AUTO_APPROVED
+  PENDING
+  APPROVED
+  REJECTED
+}
+
+enum NotificationType {
+  TRAINING_ASSIGNED
+  DOCUMENT_PUBLISHED
+  POLICY_ACK_REQUIRED
+  QUOTATION_APPROVAL_REQUEST
+  QUOTATION_APPROVED
+  QUOTATION_REJECTED
+  SECURITY_ALERT
+  SYSTEM
+}
+
+enum AuditAction {
+  LOGIN
+  LOGOUT
+  VIEW_SENSITIVE_DOC
+  DOWNLOAD_DOC
+  UPDATE_DOC
+  CREATE_QUOTATION
+  UPDATE_QUOTATION
+  APPROVE_QUOTATION
+  UPDATE_ROLE_PERMISSION
+  ACK_POLICY
+  OTHER
+}
+
+model User {
+  id             String           @id @default(cuid())
+  fullName       String
+  email          String           @unique
+  emailVerified  DateTime?
+  passwordHash   String?
+  phoneNumber    String?
+  title          String?
+  positionCode   String?
+  status         UserStatus       @default(PROBATION)
+  employmentLv   EmploymentLevel  @default(STAFF)
+  isActive       Boolean          @default(true)
+  avatarUrl      String?
+  departmentId   String?
+  department     Department?      @relation(fields: [departmentId], references: [id])
+  roles          UserRole[]
+  courseAssignments CourseAssignment[] @relation("CourseAssignmentUserTarget")
+  enrollments    Enrollment[]
+  quizAttempts   QuizAttempt[]
+  docVersions    DocumentVersion[] @relation("DocumentVersionAuthor")
+  policyVersions PolicyVersion[]   @relation("PolicyVersionAuthor")
+  policyAcks     PolicyAcknowledgement[]
+  quotations     Quotation[]       @relation("QuotationCreator")
+  quotationFormulaChanges QuotationFormulaConfig[] @relation("QuotationFormulaChangedBy")
+  quotationVersions QuotationVersion[] @relation("QuotationVersionCreator")
+  quotationApprovalRequests QuotationApproval[] @relation("QuotationRequestedBy")
+  quotationApprovals QuotationApproval[] @relation("QuotationApprover")
+  notifications  Notification[]
+  auditLogs      AuditLog[]
+  sessions       Session[]
+  accounts       Account[]
+  authenticators Authenticator[]
+  createdAt      DateTime         @default(now())
+  updatedAt      DateTime         @updatedAt
+}
+
+model Department {
+  id          String   @id @default(cuid())
+  code        String   @unique
+  name        String
+  description String?
+  users       User[]
+  courseAssignments CourseAssignment[] @relation("CourseAssignmentDepartmentTarget")
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+model Role {
+  id          String           @id @default(cuid())
+  code        String           @unique
+  name        String
+  description String?
+  isSystem    Boolean          @default(false)
+  users       UserRole[]
+  permissions RolePermission[]
+  assignments CourseAssignment[]
+  createdAt   DateTime         @default(now())
+  updatedAt   DateTime         @updatedAt
+}
+
+model Permission {
+  id          String           @id @default(cuid())
+  module      String
+  action      String
+  key         String           @unique
+  description String?
+  roles       RolePermission[]
+  createdAt   DateTime         @default(now())
+  updatedAt   DateTime         @updatedAt
+
+  @@unique([module, action])
+}
+
+model RolePermission {
+  id           String     @id @default(cuid())
+  roleId       String
+  permissionId String
+  role         Role       @relation(fields: [roleId], references: [id], onDelete: Cascade)
+  permission   Permission @relation(fields: [permissionId], references: [id], onDelete: Cascade)
+  createdAt    DateTime   @default(now())
+
+  @@unique([roleId, permissionId])
+}
+
+model UserRole {
+  id        String   @id @default(cuid())
+  userId    String
+  roleId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  role      Role     @relation(fields: [roleId], references: [id], onDelete: Cascade)
+  createdAt DateTime @default(now())
+
+  @@unique([userId, roleId])
+}
+
+model Course {
+  id               String             @id @default(cuid())
+  title            String
+  slug             String             @unique
+  description      String?
+  topic            String?
+  isPublished      Boolean            @default(false)
+  assignments      CourseAssignment[]
+  modules          CourseModule[]
+  quizzes          Quiz[]
+  enrollments      Enrollment[]
+  createdAt        DateTime           @default(now())
+  updatedAt        DateTime           @updatedAt
+}
+
+model CourseAssignment {
+  id               String               @id @default(cuid())
+  courseId         String
+  targetType       AssignmentTargetType
+  targetUserId     String?
+  targetRoleId     String?
+  targetDepartmentId String?
+  targetPosition   String?
+  dueAt            DateTime?
+  course           Course               @relation(fields: [courseId], references: [id], onDelete: Cascade)
+  targetUser       User?                @relation("CourseAssignmentUserTarget", fields: [targetUserId], references: [id], onDelete: Cascade)
+  targetRole       Role?                @relation(fields: [targetRoleId], references: [id], onDelete: Cascade)
+  targetDepartment Department?          @relation("CourseAssignmentDepartmentTarget", fields: [targetDepartmentId], references: [id], onDelete: Cascade)
+  createdAt        DateTime             @default(now())
+}
+
+model CourseModule {
+  id        String   @id @default(cuid())
+  courseId  String
+  title     String
+  orderNo   Int
+  course    Course   @relation(fields: [courseId], references: [id], onDelete: Cascade)
+  lessons   Lesson[]
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Lesson {
+  id            String      @id @default(cuid())
+  courseModuleId String
+  title         String
+  type          LessonType
+  content       String?
+  mediaUrl      String?
+  downloadable  Boolean     @default(false)
+  orderNo       Int
+  estimatedMin  Int?
+  courseModule  CourseModule @relation(fields: [courseModuleId], references: [id], onDelete: Cascade)
+  enrollments   EnrollmentLessonProgress[]
+  createdAt     DateTime     @default(now())
+  updatedAt     DateTime     @updatedAt
+}
+
+model Quiz {
+  id            String         @id @default(cuid())
+  courseId      String
+  title         String
+  passScore     Int            @default(70)
+  maxAttempts   Int            @default(3)
+  course        Course         @relation(fields: [courseId], references: [id], onDelete: Cascade)
+  questions     QuizQuestion[]
+  attempts      QuizAttempt[]
+  createdAt     DateTime       @default(now())
+  updatedAt     DateTime       @updatedAt
+}
+
+model QuizQuestion {
+  id            String           @id @default(cuid())
+  quizId        String
+  type          QuizQuestionType
+  question      String
+  options       Json?
+  correctAnswer Json?
+  point         Int              @default(1)
+  orderNo       Int
+  quiz          Quiz             @relation(fields: [quizId], references: [id], onDelete: Cascade)
+  createdAt     DateTime         @default(now())
+  updatedAt     DateTime         @updatedAt
+}
+
+model QuizAttempt {
+  id             String   @id @default(cuid())
+  quizId         String
+  userId         String
+  score          Int      @default(0)
+  passed         Boolean  @default(false)
+  attemptNo      Int      @default(1)
+  answers        Json?
+  submittedAt    DateTime?
+  gradedAt       DateTime?
+  quiz           Quiz     @relation(fields: [quizId], references: [id], onDelete: Cascade)
+  user           User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  createdAt      DateTime @default(now())
+
+  @@index([quizId, userId])
+}
+
+model Enrollment {
+  id              String   @id @default(cuid())
+  userId          String
+  courseId        String
+  progressPercent Float    @default(0)
+  completedAt     DateTime?
+  dueAt           DateTime?
+  isOverdue       Boolean  @default(false)
+  user            User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  course          Course   @relation(fields: [courseId], references: [id], onDelete: Cascade)
+  lessons         EnrollmentLessonProgress[]
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  @@unique([userId, courseId])
+}
+
+model EnrollmentLessonProgress {
+  id           String     @id @default(cuid())
+  enrollmentId String
+  lessonId     String
+  isCompleted  Boolean    @default(false)
+  completedAt  DateTime?
+  enrollment   Enrollment @relation(fields: [enrollmentId], references: [id], onDelete: Cascade)
+  lesson       Lesson     @relation(fields: [lessonId], references: [id], onDelete: Cascade)
+
+  @@unique([enrollmentId, lessonId])
+}
+
+model Document {
+  id            String            @id @default(cuid())
+  title         String
+  slug          String            @unique
+  category      String?
+  tags          String[]
+  status        DocumentStatus    @default(DRAFT)
+  currentVersion Int              @default(1)
+  isDownloadable Boolean          @default(true)
+  isSensitive   Boolean           @default(false)
+  versions      DocumentVersion[]
+  createdAt     DateTime          @default(now())
+  updatedAt     DateTime          @updatedAt
+}
+
+model DocumentVersion {
+  id             String   @id @default(cuid())
+  documentId     String
+  versionNo      Int
+  fileUrl        String
+  fileName       String
+  fileMime       String
+  fileSize       Int
+  checksum       String?
+  changeSummary  String?
+  createdById    String
+  createdBy      User     @relation("DocumentVersionAuthor", fields: [createdById], references: [id], onDelete: Restrict)
+  document       Document @relation(fields: [documentId], references: [id], onDelete: Cascade)
+  createdAt      DateTime @default(now())
+
+  @@unique([documentId, versionNo])
+}
+
+model Policy {
+  id               String         @id @default(cuid())
+  title            String
+  slug             String         @unique
+  status           PolicyStatus   @default(DRAFT)
+  issuingAuthority String?
+  latestVersionNo  Int            @default(1)
+  versions         PolicyVersion[]
+  acknowledgements PolicyAcknowledgement[]
+  createdAt        DateTime       @default(now())
+  updatedAt        DateTime       @updatedAt
+}
+
+model PolicyVersion {
+  id             String   @id @default(cuid())
+  policyId       String
+  versionNo      Int
+  content        String
+  issuedAt       DateTime?
+  effectiveAt    DateTime?
+  expiredAt      DateTime?
+  updatedById    String
+  updatedBy      User     @relation("PolicyVersionAuthor", fields: [updatedById], references: [id], onDelete: Restrict)
+  policy         Policy   @relation(fields: [policyId], references: [id], onDelete: Cascade)
+  createdAt      DateTime @default(now())
+
+  @@unique([policyId, versionNo])
+}
+
+model PolicyAcknowledgement {
+  id              String   @id @default(cuid())
+  policyId        String
+  policyVersionNo Int
+  userId          String
+  acknowledgedAt  DateTime @default(now())
+  ipAddress       String?
+  userAgent       String?
+  policy          Policy   @relation(fields: [policyId], references: [id], onDelete: Cascade)
+  user            User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([policyId, policyVersionNo, userId])
+}
+
+model QuotationTemplate {
+  id          String   @id @default(cuid())
+  code        String   @unique
+  name        String
+  description String?
+  active      Boolean  @default(true)
+  quotations  Quotation[]
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+model QuotationFormulaConfig {
+  id             String   @id @default(cuid())
+  name           String
+  isActive       Boolean  @default(false)
+  versionNo      Int
+  expressionJson Json
+  changedById    String
+  changeReason   String?
+  changedAt      DateTime @default(now())
+  changedBy      User     @relation("QuotationFormulaChangedBy", fields: [changedById], references: [id], onDelete: Restrict)
+  quotations     Quotation[]
+}
+
+model QuotationMaterial {
+  id            String   @id @default(cuid())
+  code          String   @unique
+  name          String
+  unit          String
+  type          String
+  unitCost      Decimal  @db.Decimal(15, 2)
+  wastageRate   Decimal? @db.Decimal(7, 4)
+  difficultyK   Decimal? @db.Decimal(7, 4)
+  distanceK     Decimal? @db.Decimal(7, 4)
+  active        Boolean  @default(true)
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+}
+
+model Quotation {
+  id                 String            @id @default(cuid())
+  code               String            @unique
+  customerName       String
+  projectType        String
+  scope              String?
+  notes              String?
+  discountPercent    Decimal           @default(0) @db.Decimal(7, 4)
+  discountReason     String?
+  status             QuotationStatus   @default(DRAFT)
+  validUntil         DateTime?
+  subtotal           Decimal           @default(0) @db.Decimal(15, 2)
+  vatAmount          Decimal           @default(0) @db.Decimal(15, 2)
+  totalAmount        Decimal           @default(0) @db.Decimal(15, 2)
+  estimatedCost      Decimal           @default(0) @db.Decimal(15, 2)
+  expectedProfit     Decimal           @default(0) @db.Decimal(15, 2)
+  marginPercent      Decimal           @default(0) @db.Decimal(7, 4)
+  isInternalVersion  Boolean           @default(true)
+  templateId         String?
+  formulaConfigId    String?
+  createdById        String
+  template           QuotationTemplate?     @relation(fields: [templateId], references: [id], onDelete: SetNull)
+  formulaConfig      QuotationFormulaConfig? @relation(fields: [formulaConfigId], references: [id], onDelete: SetNull)
+  createdBy          User             @relation("QuotationCreator", fields: [createdById], references: [id], onDelete: Restrict)
+  items              QuotationItem[]
+  versions           QuotationVersion[]
+  approvals          QuotationApproval[]
+  createdAt          DateTime         @default(now())
+  updatedAt          DateTime         @updatedAt
+}
+
+model QuotationItem {
+  id               String   @id @default(cuid())
+  quotationId      String
+  name             String
+  description      String?
+  quantity         Decimal  @default(1) @db.Decimal(12, 3)
+  unit             String?
+  unitPrice        Decimal  @default(0) @db.Decimal(15, 2)
+  lineTotal        Decimal  @default(0) @db.Decimal(15, 2)
+  estimatedCost    Decimal  @default(0) @db.Decimal(15, 2)
+  projectedProfit  Decimal  @default(0) @db.Decimal(15, 2)
+  quotation        Quotation @relation(fields: [quotationId], references: [id], onDelete: Cascade)
+  createdAt        DateTime @default(now())
+  updatedAt        DateTime @updatedAt
+}
+
+model QuotationVersion {
+  id               String    @id @default(cuid())
+  quotationId      String
+  versionNo        Int
+  isFinal          Boolean   @default(false)
+  snapshotJson     Json
+  createdById      String
+  createdBy        User      @relation("QuotationVersionCreator", fields: [createdById], references: [id], onDelete: Restrict)
+  quotation        Quotation @relation(fields: [quotationId], references: [id], onDelete: Cascade)
+  createdAt        DateTime  @default(now())
+
+  @@unique([quotationId, versionNo])
+}
+
+model QuotationApproval {
+  id                  String         @id @default(cuid())
+  quotationId         String
+  requestedById       String
+  approverId          String?
+  discountThreshold   Decimal        @default(0) @db.Decimal(7, 4)
+  requestedDiscount   Decimal        @default(0) @db.Decimal(7, 4)
+  reason              String?
+  status              ApprovalStatus @default(PENDING)
+  decisionAt          DateTime?
+  decisionNote        String?
+  quotation           Quotation      @relation(fields: [quotationId], references: [id], onDelete: Cascade)
+  requestedBy         User           @relation("QuotationRequestedBy", fields: [requestedById], references: [id], onDelete: Restrict)
+  approver            User?          @relation("QuotationApprover", fields: [approverId], references: [id], onDelete: SetNull)
+  createdAt           DateTime       @default(now())
+  updatedAt           DateTime       @updatedAt
+}
+
+model Notification {
+  id          String           @id @default(cuid())
+  userId      String
+  type        NotificationType
+  title       String
+  message     String
+  route       String?
+  readAt      DateTime?
+  metadata    Json?
+  user        User             @relation(fields: [userId], references: [id], onDelete: Cascade)
+  createdAt   DateTime         @default(now())
+}
+
+model AuditLog {
+  id          String      @id @default(cuid())
+  actorId     String?
+  action      AuditAction
+  module      String
+  resource    String
+  resourceId  String?
+  metadata    Json?
+  ipAddress   String?
+  userAgent   String?
+  actor       User?       @relation(fields: [actorId], references: [id], onDelete: SetNull)
+  createdAt   DateTime    @default(now())
+
+  @@index([module, resource, createdAt])
+}
+
+model Session {
+  id           String   @id @default(cuid())
+  sessionToken String   @unique
+  userId       String
+  expires      DateTime
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model Account {
+  id                String  @id @default(cuid())
+  userId            String
+  type              String
+  provider          String
+  providerAccountId String
+  refresh_token     String?
+  access_token      String?
+  expires_at        Int?
+  token_type        String?
+  scope             String?
+  id_token          String?
+  session_state     String?
+  user              User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([provider, providerAccountId])
+}
+
+model VerificationToken {
+  identifier String
+  token      String   @unique
+  expires    DateTime
+
+  @@unique([identifier, token])
+}
+
+model Authenticator {
+  credentialID         String  @unique
+  userId               String
+  providerAccountId    String
+  credentialPublicKey  String
+  counter              Int
+  credentialDeviceType String
+  credentialBackedUp   Boolean
+  transports           String?
+  user                 User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@id([userId, credentialID])
+}
