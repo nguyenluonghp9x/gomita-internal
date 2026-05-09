@@ -85,6 +85,11 @@ npm run dev
 - `/notifications` — danh sách, **Mark read** / **Mark all read** (quyền `notifications.view`).
 - Thanh layout: badge + **Messages**: số tin **realtime nhẹ** qua SSE `GET /api/notifications/stream` (poll DB trong khoảng `NOTIFICATION_SSE_POLL_MS`; với serverless/ngắt kết nối sớm, dùng host container/VM hoặc chấp nhận reload).
 
+## Newsroom (demo nội dung)
+
+- `/news` — trang bài viết nội bộ demo cho QA/UAT (Sales Ops, Training, Compliance).
+- Dashboard hiển thị **Featured internal posts** để website sinh động hơn khi test.
+
 ## Quotations (báo giá)
 
 - `/quotations`:

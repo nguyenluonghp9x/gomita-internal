@@ -66,6 +66,10 @@ export default function LoginPage() {
         >
           {loading ? "Signing in..." : "Sign in"}
         </button>
+
+        <div className="rounded-lg border border-[#eadcc3] bg-[#fff8ee] px-3 py-2 text-xs text-[#7a5b2d]">
+          Demo account: admin@gomita.local / Admin@123456
+        </div>
       </form>
     </div>
   );

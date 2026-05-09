@@ -8,6 +8,7 @@ import {
   Calculator,
   FileText,
   LayoutDashboard,
+  Newspaper,
   ShieldCheck,
   Users2,
 } from "lucide-react";
@@ -16,6 +17,7 @@ import { useNotificationUnreadStream } from "@/hooks/use-notification-unread-str
 
 const nav = [
   { href: "/dashboard", label: "Dashboard", icon: LayoutDashboard },
+  { href: "/news", label: "Newsroom", icon: Newspaper },
   { href: "/training", label: "Training", icon: BookOpen },
   { href: "/documents", label: "Documents", icon: FileText },
   { href: "/policies", label: "Policies", icon: ShieldCheck },
@@ -38,9 +40,13 @@ export function DashboardShell({
     <div className="min-h-screen">
       <div className="mx-auto grid max-w-[1300px] grid-cols-[250px_1fr] gap-6 px-4 py-6">
         <aside className="app-card p-4">
-          <div className="mb-5 rounded-xl bg-[#20344c] p-4 text-white">
-            <p className="text-[11px] uppercase tracking-[0.16em] text-white/70">GOMITA</p>
+          <div className="mb-5 rounded-xl bg-gradient-to-br from-[#20344c] to-[#2b4b6c] p-4 text-white">
+            <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-white/10 font-bold text-[#d1b077]">
+              G
+            </div>
+            <p className="mt-3 text-[11px] uppercase tracking-[0.16em] text-white/70">GOMITA</p>
             <h2 className="mt-1 text-lg font-semibold">Internal Portal</h2>
+            <p className="mt-1 text-xs text-white/75">Operations · Training · Compliance</p>
           </div>
           <nav className="space-y-1">
             {nav.map((item) => {
